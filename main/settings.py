@@ -29,13 +29,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+# CORS_ALLOWED_ORIGINS = [
+#     "*",
+# ]
 # Application definition
 
 INSTALLED_APPS = [
     # Third Party Apps
     'rest_framework.authtoken',
     'rest_framework',
+    'corsheaders',
     # Django Apps
     "django.contrib.admin",
     "django.contrib.auth",
@@ -45,9 +48,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # My Apps
     "mobile_api",
+    "live_detect",
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -88,10 +93,21 @@ REST_FRAMEWORK = {
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'test',
+        'USER': 'tuser',
+        'PASSWORD': '12345678',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 

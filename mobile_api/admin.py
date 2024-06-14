@@ -4,3 +4,4 @@ from .models import *
 
 admin.site.register(SystemUser)
 admin.site.register(Lesson)
+

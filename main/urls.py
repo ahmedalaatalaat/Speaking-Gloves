@@ -24,6 +24,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path("admin/", admin.site.urls),
     path("mobile_api/", include("mobile_api.urls")),
+    path("", include("live_detect.urls")),
 ]
 
 if settings.DEBUG:

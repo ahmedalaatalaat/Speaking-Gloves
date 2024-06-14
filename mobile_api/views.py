@@ -126,3 +126,4 @@ class SignLanguageLessonView(APIView):
         lessons = Lesson.objects.all()
         serializer = LessonSerializer(lessons, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
