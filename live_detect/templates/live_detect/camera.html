@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Streaming</title>
+</head>
+<body>
+    <video id="videoElement" width="640" height="480" autoplay></video>
+    <img id="annotatedFrame" width="640" height="480">
+
+    <script>
+        const videoElement = document.getElementById('videoElement');
+        const annotatedFrame = document.getElementById('annotatedFrame');
+
+        // Get user media (access webcam)
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                videoElement.srcObject = stream;
+
+                // WebSocket connection to Django server
+                const chatSocket = new WebSocket(
+                    'ws://'
+                    + window.location.host
+                    + '/ws/stream/'
+                );
+
+                chatSocket.onopen = function() {
+                    console.log('WebSocket connection established.');
+                };
+
+                chatSocket.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    if (data.image) {
+                        annotatedFrame.src = 'data:image/jpeg;base64,' + data.image;
+                    }
+                    console.log('Received data:', data.detections);
+                    // Handle the received data (e.g., display detections)
+                };
+
+                chatSocket.onclose = function() {
+                    console.log('WebSocket connection closed.');
+                };
+
+                chatSocket.onerror = function(error) {
+                    console.error('WebSocket error:', error);
+                };
+
+                videoElement.addEventListener('play', () => {
+                    const sendFrame = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = videoElement.videoWidth;
+                        canvas.height = videoElement.videoHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                        canvas.toBlob((blob) => {
+                            if (chatSocket.readyState === WebSocket.OPEN) {
+                                chatSocket.send(blob);
+                            }
+                        }, 'image/jpeg');
+                    };
+                    // Send frames at intervals (e.g., every 100ms)
+                    setInterval(sendFrame, 1000);
+                });
+            })
+            .catch((error) => {
+                console.error('Error accessing webcam:', error);
+            });
+    </script>
+</body>
+</html>
